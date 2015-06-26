@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="utf-8">
+    <title>Leia Basic Shadow Effect Example</title>
+    <style type="text/css">
+        body {
+            overflow: hidden;
+        }
+    </style>
+    <script src="https://www.leiainc.com/build/LeiaCore-latest.min.js"></script>
+    <script src="https://www.leiainc.com/latest/LeiaCore/js/helvetiker_regular.typeface.js"></script>
+    <script src="https://www.leiainc.com/latest/LeiaCore/js/helvetiker_bold.typeface.js"></script>
+</head>
+<body style="margin: 0 0 0 0;"></body>
+<script>
+    // Build The LeiaCore Objects
+    var leiaDisplayInfo = new LeiaDisplayInfo('https://www.leiainc.com/latest/LeiaCore/config/displayPrototypeSmall.json');
+    var leiaHoloScreen  = new LeiaHoloScreen(leiaDisplayInfo);
+    var leiaRenderer    = new LeiaRenderer(leiaDisplayInfo, leiaHoloScreen);
+    var scene = new THREE.Scene();
+
+    // Connect LeiaRenderer To The Page
+    document.body.appendChild(leiaRenderer.renderer.domElement);
+
+    //Create three basic shapes (primitives)
+    var boxGeometry = new THREE.BoxGeometry(3, 3, 3);
+    var sphereGeometry = new THREE.SphereGeometry(2.0, 32, 32);
+    var torusGeometry = new THREE.TorusGeometry(1.5, 1, 16, 50);
+    var cylinderGeometry = new THREE.CylinderGeometry(1.5, 1.5, 3, 32);
+    var planeGeometry = new THREE.PlaneGeometry(20, 20, 32);
+
+    var greenMaterial = new THREE.MeshPhongMaterial({ color: 0x00ff00, shininess: 30 });
+    var redMaterial = new THREE.MeshPhongMaterial( { color: 0xff0000, shininess: 30 } );
+    var blueMaterial = new THREE.MeshPhongMaterial({ color: 0x2194ce, shininess: 30 });
+    var whiteMaterial = new THREE.MeshPhongMaterial( { color: 0x00ffff, shininess: 30 } );
+    var planeMaterial = new THREE.MeshBasicMaterial( {color: 0x777777, side: THREE.DoubleSide} );
+
+    var cube = new THREE.Mesh(boxGeometry, greenMaterial);
+    var sphere = new THREE.Mesh(sphereGeometry, redMaterial);
+    var torus = new THREE.Mesh(torusGeometry, blueMaterial);
+    var cylinder = new THREE.Mesh(cylinderGeometry, whiteMaterial);
+    var plane = new THREE.Mesh(planeGeometry, planeMaterial);
+
+    // Set Shape Positions
+    sphere.position.z = 2.0;
+    cube.position.x = 5;
+    cube.position.z = 1.5;
+    torus.position.x = 5;
+    torus.position.y = -5;
+    torus.position.z = 1;
+    cylinder.position.z = 1.5;
+    cylinder.position.y = -4.5;
+
+    // Set Shape Rotations
+    cylinder.rotation.x = 1.57;
+
+    //Add the primitives to the scene
+    scene.add(cube);
+    scene.add(sphere);
+    scene.add(torus);
+    scene.add(cylinder);
+    scene.add(plane);
+
+    //Shadows
+    cube.castShadow = true;
+    sphere.castShadow = true;
+    torus.castShadow = true;
+    cylinder.castShadow = true;
+    cylinder.receiveShadow = true;
+
+    plane.castShadow = true;
+    plane.receiveShadow = true;
+
+    // Set up three lights (you only need one really; none if your using MeshBasicMaterial instead of MeshPhongMaterial)
+    var ambientLight = new THREE.AmbientLight(0x606060);
+    scene.add(ambientLight);
+
+    var directionalLight = new THREE.SpotLight(0xeeeeee);
+    directionalLight.position.set(20, 40, 40);
+    directionalLight.shadowMapWidth = directionalLight.shadowMapHeight = 512;
+    directionalLight.castShadow = true;
+    directionalLight.shadowDarkness = 0.7;
+    directionalLight.shadowCameraVisible = true;
+    scene.add(directionalLight);
+
+    // Render The Scene
+    leiaRenderer.render(scene, leiaHoloScreen);
+
+    function animate() {
+        // Tell The Browser What To Loop To Animate
+        requestAnimationFrame(animate);
+
+        // Animate The Sphere
+        sphere.position.z = 2*(1.5+0.5*Math.cos(Date.now() * 0.008));
+
+        // Render The Scene
+        leiaRenderer.render(scene, leiaHoloScreen);
+    }
+
+    window.onload = function () {
+        animate();
+    };
+</script>
+</html>
